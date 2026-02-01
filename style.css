@@ -61,13 +61,10 @@ body {
 .ad-skyscraper {
   width: 160px;
   height: 600px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md);
+  /* Invisible placeholder */
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--text-muted);
 }
 
 /* Hide Sidebars on Small Screens */
@@ -370,24 +367,42 @@ button:active {
 .ad-container {
   width: 100%;
   max-width: 728px;
-  height: 90px;
-  background: rgba(255, 255, 255, 0.05);
+  height: auto; /* Collapse if empty */
+  min-height: 10px; /* Small buffer */
   margin: 20px auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  overflow: hidden;
+  /* Removed visible borders/backgrounds */
 }
 
-.ad-text {
-  opacity: 0.5;
-  letter-spacing: 1px;
+/* Sidebar Ads */
+.ad-sidebar {
+  width: 180px;
+  min-width: 180px;
+  position: sticky;
+  top: 20px;
+  height: calc(100vh - 40px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+.ad-skyscraper {
+  width: 160px;
+  min-height: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Removed visible borders/backgrounds */
+}
+
+/* Hide Sidebars on Small Screens */
+@media (max-width: 1100px) {
+  .ad-sidebar {
+    display: none;
+  }
+}
 @keyframes fadeIn {
   from {
     opacity: 0;
