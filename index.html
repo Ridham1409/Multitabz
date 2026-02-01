@@ -58,71 +58,92 @@
 </head>
 
 <body>
-    <div class="app-container">
-        <header>
-            <img src="logo.png" alt="MultiTabz Logo" class="logo">
-            <h1>MultiTabz Player</h1>
-            <p>Watch YouTube videos distraction-free and muted by default.</p>
-            <strong class="seo-highlight">Getting 4000 watch hours quickly and safely</strong>
-            <br>
-            <p class="trust-badge">🛡️ 100% Legal & Safe</p>
-        </header>
+    <div class="layout-wrapper">
+        <!-- Left Sidebar Ad -->
+        <aside class="ad-sidebar left-sidebar">
+            <div class="ad-skyscraper">
+                <span class="ad-text">Vertical Ad (160x600)</span>
+            </div>
+        </aside>
 
-        <!-- Top Ad Space -->
-        <div class="ad-container">
-            <span class="ad-text">Advertisement Space (Top)</span>
+        <!-- Main Content -->
+        <div class="app-container">
+            <header>
+                <img src="logo.png" alt="MultiTabz Logo" class="logo">
+                <h1>MultiTabz Player</h1>
+                <p>Watch YouTube videos distraction-free and muted by default.</p>
+                <strong class="seo-highlight">Getting 4000 watch hours quickly and safely</strong>
+                <br>
+                <p class="trust-badge">🛡️ 100% Legal & Safe</p>
+            </header>
+
+            <!-- Top Ad Space -->
+            <div class="ad-container">
+                <span class="ad-text">Advertisement Space (Top)</span>
+            </div>
+
+            <main>
+                <div class="controls-row">
+                    <div class="control-group">
+                        <label class="input-label">How many links?</label>
+                        <select id="linkCount" class="dropdown">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="videoCount" class="input-label">Screens Per Link</label>
+                        <input type="number" id="videoCount" placeholder="10" min="1" max="50" class="count-input"
+                            title="Number of videos per link">
+                    </div>
+                    <button id="playBtn">Play Videos</button>
+                </div>
+
+                <div id="urlInputsContainer" class="url-list">
+                    <!-- Inputs generated dynamically -->
+                    <input type="text" class="video-url-input" placeholder="Paste YouTube link 1..." autocomplete="off">
+                </div>
+
+                <!-- Middle Ad Placeholder -->
+                <div class="ad-container middle-ad">
+                    <span class="ad-text">Advertisement Space (Middle)</span>
+                </div>
+
+                <div id="playersContainer" class="players-grid">
+                    <!-- Players will be generated here -->
+                    <div class="placeholder-message">
+                        <p>Videos will appear here</p>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Bottom Ad Space -->
+            <div class="ad-container">
+                <span class="ad-text">Advertisement Space (Bottom)</span>
+            </div>
+
+            <footer>
+                <div class="seo-content">
+                    <h2>How to use MultiTabz to Increase Views?</h2>
+                    <p>MultiTabz is the ultimate <strong>YouTube Multi View</strong> tool designed to help creators gain
+                        free views and increase watch time legitimately. Unlike a <em>YouTube Views Hack</em> that risks
+                        your channel, our tool uses legitimate embedded players.</p>
+                    <p>Simply paste your links, select the number of screens, and watch your analytics grow. Perfect for
+                        <strong class="seo-highlight">getting 4000 watch hours quickly and safely</strong>.</p>
+                </div>
+                <p>© 2026 MultiTabz Player. Made with ❤️ by Ridham Bhavnagariya.</p>
+            </footer>
         </div>
 
-        <main>
-            <div class="controls-row">
-                <div class="control-group">
-                    <label class="input-label">How many links?</label>
-                    <select id="linkCount" class="dropdown">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="videoCount" class="input-label">Screens Per Link</label>
-                    <input type="number" id="videoCount" placeholder="10" min="1" max="50" class="count-input"
-                        title="Number of videos per link">
-                </div>
-                <button id="playBtn">Play Videos</button>
+        <!-- Right Sidebar Ad -->
+        <aside class="ad-sidebar right-sidebar">
+            <div class="ad-skyscraper">
+                <span class="ad-text">Vertical Ad (160x600)</span>
             </div>
-
-            <div id="urlInputsContainer" class="url-list">
-                <!-- Inputs generated dynamically -->
-                <input type="text" class="video-url-input" placeholder="Paste YouTube link 1..." autocomplete="off">
-            </div>
-
-            <div id="playersContainer" class="players-grid">
-                <!-- Players will be generated here -->
-                <div class="placeholder-message">
-                    <p>Videos will appear here</p>
-                </div>
-            </div>
-        </main>
-
-        <!-- Bottom Ad Space -->
-        <div class="ad-container">
-            <span class="ad-text">Advertisement Space (Bottom)</span>
-        </div>
-
-        <footer>
-            <div class="seo-content">
-                <h2>How to use MultiTabz to Increase Views?</h2>
-                <p>MultiTabz is the ultimate <strong>YouTube Multi View</strong> tool designed to help creators gain
-                    free views and increase watch time legitimately. Unlike a <em>YouTube Views Hack</em> that risks
-                    your channel, our tool uses legitimate embedded players.</p>
-                <p>Simply paste your links, select the number of screens, and watch your analytics grow. Perfect for
-                    <strong class="seo-highlight">getting 4000 watch hours quickly and safely</strong>.
-                </p>
-            </div>
-            <p>© 2026 MultiTabz Player. Made with ❤️ by Ridham Bhavnagariya.</p>
-        </footer>
+        </aside>
     </div>
 
     <script src="script.js"></script>
