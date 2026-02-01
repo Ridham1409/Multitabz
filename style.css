@@ -403,6 +403,38 @@ button:active {
     display: none;
   }
 }
+.ad-text {
+  opacity: 0.5;
+  letter-spacing: 1px;
+}
+
+/* Contact for Ads */
+.contact-ads {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(16, 185, 129, 0.1); /* Light green tint */
+  border: 1px solid var(--primary-color);
+  border-radius: var(--radius-md);
+  display: inline-block;
+}
+
+.contact-btn {
+  display: inline-block;
+  margin-top: 5px;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  background: var(--primary-color);
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: transform 0.2s;
+}
+
+.contact-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
