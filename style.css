@@ -367,13 +367,17 @@ button:active {
 .ad-container {
   width: 100%;
   max-width: 728px;
-  height: auto; /* Collapse if empty */
-  min-height: 10px; /* Small buffer */
+  height: 90px;
+  background: rgba(255, 255, 255, 0.05);
   margin: 20px auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Removed visible borders/backgrounds */
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  overflow: hidden;
 }
 
 /* Sidebar Ads */
@@ -390,11 +394,14 @@ button:active {
 
 .ad-skyscraper {
   width: 160px;
-  min-height: 600px;
+  height: 600px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Removed visible borders/backgrounds */
+  color: var(--text-muted);
 }
 
 /* Hide Sidebars on Small Screens */
