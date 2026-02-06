@@ -48,14 +48,19 @@ body {
 
 /* Sidebar Ads */
 .ad-sidebar {
-  width: 180px;
-  min-width: 180px; /* Fixed width for skyscraper ads */
+  /* Removed fixed width to allow collapse */
   position: sticky;
   top: 20px;
   height: calc(100vh - 40px);
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-shrink: 0; /* Prevent shrinking if ad is present */
+}
+
+/* Hide sidebar if it contains an empty skyscraper (using :empty on child if possible, or just relying on layout) */
+.ad-sidebar:empty {
+  display: none;
 }
 
 .ad-skyscraper {
@@ -217,6 +222,23 @@ button:active {
   transform: translateY(0);
 }
 
+.secondary-btn {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.secondary-btn:hover {
+  background-color: #2d3748;
+  border-color: var(--primary-color);
+}
+
+.secondary-btn.active {
+  background-color: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #10b981;
+}
+
 .count-input {
   width: 60px;
   background: var(--card-bg);
@@ -242,6 +264,9 @@ button:active {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
   width: 100%;
+  /* Performance: GPU Acceleration for the container */
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* Lite Mode for better performance with many videos */
@@ -264,6 +289,8 @@ button:active {
   flex-wrap: wrap;
   gap: 20px;
   align-items: flex-start; /* Align columns at the top */
+  /* Performance: Isolate layout calculations */
+  contain: layout paint style;
 }
 
 /* Section Styles */
@@ -276,6 +303,9 @@ button:active {
   padding: 15px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
+  /* Performance optimization */
+  content-visibility: auto;
+  contain-intrinsic-size: 500px; /* Estimate height to prevent scrollbar jumping */
 }
 
 .section-header {
@@ -310,6 +340,11 @@ button:active {
   box-shadow: var(--shadow);
   border: 1px solid var(--border-color);
   animation: fadeIn 0.5s ease-out;
+  /* EPIC PERFORMANCE HACKS */
+  transform: translate3d(0, 0, 0); /* Force Hardware Acceleration */
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform;
 }
 
 .mute-btn {
@@ -367,41 +402,28 @@ button:active {
 .ad-container {
   width: 100%;
   max-width: 728px;
-  height: 90px;
-  background: rgba(255, 255, 255, 0.05);
+  /* Removed fixed height, background, border to hide when empty */
+  min-height: 0;
   margin: 20px auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
-  font-size: 0.8rem;
   overflow: hidden;
 }
 
-/* Sidebar Ads */
-.ad-sidebar {
-  width: 180px;
-  min-width: 180px;
-  position: sticky;
-  top: 20px;
-  height: calc(100vh - 40px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Hide container if empty (optional, but standard ad behavior handles this mostly) */
+.ad-container:empty {
+  display: none;
+  margin: 0;
 }
 
 .ad-skyscraper {
-  width: 160px;
-  height: 600px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md);
+  /* width: 160px; Removed to allow collapse */
+  /* Removed fixed height, background, border */
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--text-muted);
 }
 
 /* Hide Sidebars on Small Screens */
@@ -409,10 +431,6 @@ button:active {
   .ad-sidebar {
     display: none;
   }
-}
-.ad-text {
-  opacity: 0.5;
-  letter-spacing: 1px;
 }
 
 /* Contact for Ads */

@@ -1,4 +1,49 @@
 let players = [];
+let isBackgroundModeActive = false;
+let silentAudio = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//oeAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA//oeAAABAAAAJP8AAAAA//////////////8xwABhAAABiAAAAAAACcAAABH/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7+AAAAAA=");
+silentAudio.loop = true;
+
+function toggleBackgroundMode() {
+    isBackgroundModeActive = !isBackgroundModeActive;
+    const btn = document.getElementById('bgModeBtn');
+    const status = document.getElementById('bgStatus');
+
+    if (isBackgroundModeActive) {
+        btn.classList.add('active');
+        btn.innerHTML = "Disable Background Mode";
+        status.style.display = "inline";
+
+        // Play silent audio to keep session alive
+        silentAudio.play().catch(e => console.error("Audio play failed:", e));
+
+        // Setup Media Session
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: 'MultiTabz Active',
+                artist: 'Background Mode On',
+                album: 'MultiTabz Player',
+                artwork: [
+                    { src: 'favicon.png', sizes: '96x96', type: 'image/png' },
+                    { src: 'logo.png', sizes: '192x192', type: 'image/png' }
+                ]
+            });
+
+            navigator.mediaSession.setActionHandler('play', function () {
+                silentAudio.play();
+            });
+            navigator.mediaSession.setActionHandler('pause', function () {
+                // Do nothing or re-play to prevent pausing
+                silentAudio.play();
+            });
+        }
+
+    } else {
+        btn.classList.remove('active');
+        btn.innerHTML = "Enable Background Mode";
+        status.style.display = "none";
+        silentAudio.pause();
+    }
+}
 
 function onYouTubeIframeAPIReady() {
     console.log('YouTube IFrame API Ready');
@@ -48,17 +93,19 @@ function loadVideo() {
     const totalVideos = countPerLink * validVideoIds.length;
 
     // Limit count to reasonable number to prevent browser crash
-    if (totalVideos > 200) {
-        alert(`Too many videos! ${countPerLink} screens x ${validVideoIds.length} links = ${totalVideos}. Max limit is 200 total.`);
+    if (totalVideos > 1000) {
+        alert(`Too many videos! ${countPerLink} screens x ${validVideoIds.length} links = ${totalVideos}. Max limit is 1000 total.`);
         return;
     }
 
     // Performance: Explicitly destroy old players to free memory
     if (players && players.length > 0) {
         players.forEach(p => {
-            if (p && typeof p.destroy === 'function') {
-                p.destroy();
-            }
+            try {
+                if (p && typeof p.destroy === 'function') {
+                    p.destroy();
+                }
+            } catch (e) { console.warn("Player destroy error", e); }
         });
     }
 
@@ -67,7 +114,7 @@ function loadVideo() {
     container.innerHTML = '';
 
     // Performance: Switch to Lite Mode if total is high (> 20)
-    const isLiteMode = totalVideos > 20;
+    const isLiteMode = totalVideos > 10;
 
     players = [];
 
@@ -108,28 +155,50 @@ function loadVideo() {
     // Staggered loading: Fill sections one by one
     let currentSectionIndex = 0;
 
-    function createNextPlayer() {
+    // Batch Loader Logic
+    function createNextBatch() {
         if (currentSectionIndex >= sectionGrids.length) return;
 
-        const currentSection = sectionGrids[currentSectionIndex];
-        const currentGrid = currentSection.grid;
-        const currentCount = parseInt(currentGrid.dataset.current);
-        const maxCount = currentSection.max;
+        // BATCH SIZE: Create this many players per frame. 
+        // 8 is a good balance between speed and UI responsiveness.
+        const BATCH_SIZE = 8;
 
-        if (currentCount >= maxCount) {
-            // Move to next section
-            currentSectionIndex++;
-            setTimeout(createNextPlayer, 0); // Immediate jump to next section
-            return;
+        for (let i = 0; i < BATCH_SIZE; i++) {
+            // Check if we finished all sections
+            if (currentSectionIndex >= sectionGrids.length) return;
+
+            const currentSection = sectionGrids[currentSectionIndex];
+            const currentGrid = currentSection.grid;
+            const currentCount = parseInt(currentGrid.dataset.current);
+            const maxCount = currentSection.max;
+
+            if (currentCount >= maxCount) {
+                currentSectionIndex++;
+                // Decrement i so we don't skip a slot in this batch for the next section
+                i--;
+                continue;
+            }
+
+            // Create individual player
+            createSinglePlayer(currentSection, currentGrid, currentSectionIndex, currentCount);
+
+            // Update the grid counter manually here
+            currentGrid.dataset.current = currentCount + 1;
         }
 
+        // Schedule next batch
+        requestAnimationFrame(createNextBatch);
+    }
+
+    // Helper to keep code clean
+    function createSinglePlayer(currentSection, currentGrid, sectionIdx, count) {
         // Create wrapper div
         const wrapper = document.createElement('div');
         wrapper.className = 'player-wrapper';
 
         // Create player div
         const playerDiv = document.createElement('div');
-        const playerId = `player-${currentSectionIndex}-${currentCount}`;
+        const playerId = `player-${sectionIdx}-${count}`;
         playerDiv.id = playerId;
 
         wrapper.appendChild(playerDiv);
@@ -137,7 +206,7 @@ function loadVideo() {
         // Mute Button Overlay
         const muteBtn = document.createElement('button');
         muteBtn.className = 'mute-btn';
-        muteBtn.innerHTML = '🔇'; // Default muted
+        muteBtn.innerHTML = '🔇';
         muteBtn.title = "Unmute";
 
         wrapper.appendChild(muteBtn);
@@ -154,11 +223,14 @@ function loadVideo() {
                 'controls': 0, // Hide controls
                 'rel': 0,
                 'mute': 1,
+                'disablekb': 1,
+                'fs': 0,
                 'origin': window.location.origin
             },
             events: {
                 'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
+                'onStateChange': onPlayerStateChange,
+                'onError': onPlayerError
             }
         });
 
@@ -176,15 +248,10 @@ function loadVideo() {
         });
 
         players.push(player);
-
-        // Update count
-        currentGrid.dataset.current = currentCount + 1;
-
-        // Schedule next creation
-        setTimeout(createNextPlayer, 200); // 200ms delay between each player
     }
 
-    createNextPlayer();
+    // Start the batch loop
+    createNextBatch();
 }
 
 function onPlayerReady(event) {
@@ -192,6 +259,12 @@ function onPlayerReady(event) {
     event.target.setPlaybackQuality('tiny'); // Force low quality
     event.target.playVideo();
 }
+
+function onPlayerError(event) {
+    console.warn("YouTube Player Error:", event.data);
+    // If error 150 or 101 (restricted), we could try reloading or just ignoring
+}
+
 
 function onPlayerStateChange(event) {
     // YT.PlayerState.ENDED = 0
@@ -202,7 +275,8 @@ function onPlayerStateChange(event) {
     }
 
     if (event.data === YT.PlayerState.PAUSED) {
-        // Force resume if it pauses (since we hid controls, this is likely automated stops)
+        // Force resume if it pauses (since we hid controls, this is likely automated stops OR background throttling)
+        // If Background Mode is active, we AGGRESSIVELY resume.
         event.target.playVideo();
     }
 
@@ -217,14 +291,26 @@ function onPlayerStateChange(event) {
 setInterval(() => {
     if (players.length > 0) {
         players.forEach(player => {
-            if (player && typeof player.setPlaybackQuality === 'function') {
-                player.setPlaybackQuality('tiny');
+            try {
+                if (player && typeof player.setPlaybackQuality === 'function') {
+                    // Force tiny quality (144p)
+                    player.setPlaybackQuality('tiny');
+
+                    // Also ensure it's muted to save audio processing
+                    if (!player.isMuted()) {
+                        // Optional: Force mute if strict mode (commented out for user freedom)
+                        // player.mute(); 
+                    }
+                }
+            } catch (e) {
+                // Ignore errors from destroyed players
             }
         });
     }
-}, 4000);
+}, 3000); // Check every 3 seconds
 
 document.getElementById('playBtn').addEventListener('click', loadVideo);
+document.getElementById('bgModeBtn').addEventListener('click', toggleBackgroundMode);
 
 document.getElementById('videoUrl').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
